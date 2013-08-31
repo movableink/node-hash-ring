@@ -6,3 +6,5 @@ init (v8::Handle<v8::Object> target) {
     v8::HandleScope scope;
     HashRing::Initialize(target);
 }
+
+NODE_MODULE(hash_ring, init);
