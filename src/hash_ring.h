@@ -31,8 +31,8 @@ class HashRing : public node::ObjectWrap {
 
     static void Initialize(v8::Handle<v8::Object> target);
 
-    static v8::Handle<v8::Value> New(const v8::Arguments &args);
-    static v8::Handle<v8::Value> GetNode(const v8::Arguments &args);
+    static void New(const v8::FunctionCallbackInfo<v8::Value>& info);
+    static void GetNode(const v8::FunctionCallbackInfo<v8::Value>& info);
 
   private:
     static void hash_digest(char *in, unsigned char out[16]);

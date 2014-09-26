@@ -33,14 +33,16 @@ int HashRing::vpoint_compare(Vpoint *a, Vpoint *b) {
 }
 
 void HashRing::Initialize(Handle<Object> target) {
-    HandleScope scope;
+    Isolate* isolate = Isolate::GetCurrent();
+    HandleScope scope(isolate);
 
-    Local<FunctionTemplate> t = FunctionTemplate::New(New);
+    Local<FunctionTemplate> t = FunctionTemplate::New(isolate, New);
     t->InstanceTemplate()->SetInternalFieldCount(1);
 
     NODE_SET_PROTOTYPE_METHOD(t, "getNode", GetNode);
 
-    target->Set(String::NewSymbol("HashRing"), t->GetFunction());
+    target->Set(v8::String::NewFromUtf8(isolate, "HashRing", v8::String::kInternalizedString),
+                t->GetFunction());
 }
 
 HashRing::HashRing(Local<Object> weight_hash) : ObjectWrap() {
@@ -48,7 +50,7 @@ HashRing::HashRing(Local<Object> weight_hash) : ObjectWrap() {
     Local<String> node_name;
     uint32_t weight, weight_total = 0;
     unsigned int num_servers = node_names->Length();
-    
+
     NodeInfo *node_list = new NodeInfo[num_servers];
     // Construct the server list based on the weight hash
     for (unsigned int i = 0; i < num_servers; i++) {
@@ -95,26 +97,28 @@ HashRing::~HashRing(){
 	delete [] ring.vpoints;
 }
 
-Handle<Value> HashRing::New(const Arguments &args) {
-    HandleScope scope;
+void HashRing::New(const v8::FunctionCallbackInfo<v8::Value>& info) {
+    Isolate* isolate = Isolate::GetCurrent();
+    HandleScope scope(isolate);
 
-    if (args[0]->IsObject()) {
-        Local<Object> weight_hash = args[0]->ToObject();
+    if (info[0]->IsObject()) {
+        Local<Object> weight_hash = info[0]->ToObject();
         HashRing *hash_ring = new HashRing(weight_hash);
-        hash_ring->Wrap(args.This());
-        return args.This();
+        hash_ring->Wrap(info.This());
+        info.GetReturnValue().Set(info.This());
     } else {
-        return ThrowException(Exception::TypeError(String::New("Bad argument")));
+      isolate->ThrowException(Exception::TypeError(v8::String::NewFromUtf8(isolate, "Bad argument")));
     }
 }
 
-Handle<Value> HashRing::GetNode(const Arguments &args) {
-    HandleScope scope;
+void HashRing::GetNode(const v8::FunctionCallbackInfo<v8::Value>& info) {
+    Isolate* isolate = Isolate::GetCurrent();
+    HandleScope scope(isolate);
 
-    HashRing *hash_ring = ObjectWrap::Unwrap<HashRing>(args.This());
+    HashRing *hash_ring = ObjectWrap::Unwrap<HashRing>(info.This());
     Ring* ring = &(hash_ring->ring);
 
-    Local<String> str = args[0]->ToString();
+    Local<String> str = info[0]->ToString();
     String::Utf8Value utfVal(str);
     char* key = *utfVal;
     unsigned int h = hash_val(key);
@@ -126,17 +130,25 @@ Handle<Value> HashRing::GetNode(const Arguments &args) {
     while (true)
     {
         mid = (int) ( (low + high) / 2);
-        if (mid == ring->num_points)
-            return String::New(vpoint_arr[0].id); // We're at the end. Go to 0
+        if (mid == ring->num_points) {
+            // We're at the end. Go to 0
+            info.GetReturnValue().Set(String::NewFromUtf8(isolate, vpoint_arr[0].id));
+            return;
+        }
+
         mid_val = vpoint_arr[mid].point;
         mid_val_1 = mid == 0 ? 0 : vpoint_arr[mid-1].point;
-        if (h <= mid_val && h > mid_val_1)
-            return String::New(vpoint_arr[mid].id);
+        if (h <= mid_val && h > mid_val_1) {
+            info.GetReturnValue().Set(String::NewFromUtf8(isolate, vpoint_arr[mid].id));
+            return;
+        }
         if (mid_val < h)
             low = mid + 1;
         else
             high = mid - 1;
-        if (low > high)
-            return String::New(vpoint_arr[0].id);
+        if (low > high) {
+            info.GetReturnValue().Set(String::NewFromUtf8(isolate, vpoint_arr[0].id));
+            return;
+        }
     }
 }
