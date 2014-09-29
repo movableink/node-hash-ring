@@ -3,10 +3,10 @@
 #include <math.h>   // For floorf
 #include <string.h> // For strlen
 #include "md5.h"
+#include <nan.h>
 #include "hash_ring.h"
 #include <iostream>
 using namespace std;
-
 using namespace v8;
 using namespace node;
 
@@ -21,11 +21,11 @@ unsigned int HashRing::hash_val(char *in) {
     unsigned char digest[16];
     hash_digest(in, digest);
     return (unsigned int) (
-        (digest[3] << 24) |
-        (digest[2] << 16) |
-        (digest[1] << 8) |
-         digest[0]
-    );
+                           (digest[3] << 24) |
+                           (digest[2] << 16) |
+                           (digest[1] << 8) |
+                           digest[0]
+                           );
 }
 
 int HashRing::vpoint_compare(Vpoint *a, Vpoint *b) {
@@ -33,22 +33,19 @@ int HashRing::vpoint_compare(Vpoint *a, Vpoint *b) {
 }
 
 void HashRing::Initialize(Handle<Object> target) {
-    Isolate* isolate = Isolate::GetCurrent();
-    HandleScope scope(isolate);
-
-    Local<FunctionTemplate> t = FunctionTemplate::New(isolate, New);
+    NanScope();
+    Local<FunctionTemplate> t = NanNew<FunctionTemplate>(New);
     t->InstanceTemplate()->SetInternalFieldCount(1);
 
     NODE_SET_PROTOTYPE_METHOD(t, "getNode", GetNode);
 
-    target->Set(v8::String::NewFromUtf8(isolate, "HashRing", v8::String::kInternalizedString),
-                t->GetFunction());
+    target->Set(NanNew("HashRing"), t->GetFunction());
 }
 
 HashRing::HashRing(Local<Object> weight_hash) : ObjectWrap() {
     Local<Array> node_names = weight_hash->GetPropertyNames();
     Local<String> node_name;
-    uint32_t weight, weight_total = 0;
+    uint32_t weight_total = 0;
     unsigned int num_servers = node_names->Length();
 
     NodeInfo *node_list = new NodeInfo[num_servers];
@@ -78,9 +75,9 @@ HashRing::HashRing(Local<Object> weight_hash) : ObjectWrap() {
             int m;
             for (m = 0; m < 4; m++) {
                 vpoint_list[vpoint_idx].point = (digest[3 + m*4] << 24) |
-                                                (digest[2 + m*4] << 16) |
-                                                (digest[1 + m*4] << 8) |
-                                                 digest[m*4];
+                    (digest[2 + m*4] << 16) |
+                    (digest[1 + m*4] << 8) |
+                    digest[m*4];
                 vpoint_list[vpoint_idx].id = node_list[j].id;
                 vpoint_idx++;
             }
@@ -94,31 +91,30 @@ HashRing::HashRing(Local<Object> weight_hash) : ObjectWrap() {
 }
 
 HashRing::~HashRing(){
-	delete [] ring.vpoints;
+    delete [] ring.vpoints;
 }
 
-void HashRing::New(const v8::FunctionCallbackInfo<v8::Value>& info) {
-    Isolate* isolate = Isolate::GetCurrent();
-    HandleScope scope(isolate);
+NAN_METHOD(HashRing::New) {
+    NanScope();
 
-    if (info[0]->IsObject()) {
-        Local<Object> weight_hash = info[0]->ToObject();
+    if (args.Length() >= 1 && args[0]->IsObject()) {
+        Local<Object> weight_hash = args[0]->ToObject();
         HashRing *hash_ring = new HashRing(weight_hash);
-        hash_ring->Wrap(info.This());
-        info.GetReturnValue().Set(info.This());
+
+        hash_ring->Wrap(args.This());
+        NanReturnValue(args.This());
     } else {
-      isolate->ThrowException(Exception::TypeError(v8::String::NewFromUtf8(isolate, "Bad argument")));
+        NanThrowTypeError("Bad argument");
     }
 }
 
-void HashRing::GetNode(const v8::FunctionCallbackInfo<v8::Value>& info) {
-    Isolate* isolate = Isolate::GetCurrent();
-    HandleScope scope(isolate);
+NAN_METHOD(HashRing::GetNode) {
+    HashRing *hash_ring = ObjectWrap::Unwrap<HashRing>(args.This());
+    NanScope();
 
-    HashRing *hash_ring = ObjectWrap::Unwrap<HashRing>(info.This());
     Ring* ring = &(hash_ring->ring);
 
-    Local<String> str = info[0]->ToString();
+    Local<String> str = args[0]->ToString();
     String::Utf8Value utfVal(str);
     char* key = *utfVal;
     unsigned int h = hash_val(key);
@@ -128,27 +124,27 @@ void HashRing::GetNode(const v8::FunctionCallbackInfo<v8::Value>& info) {
     int low = 0, mid;
     unsigned int mid_val, mid_val_1;
     while (true)
-    {
-        mid = (int) ( (low + high) / 2);
-        if (mid == ring->num_points) {
-            // We're at the end. Go to 0
-            info.GetReturnValue().Set(String::NewFromUtf8(isolate, vpoint_arr[0].id));
-            return;
-        }
+        {
+            mid = (int) ( (low + high) / 2);
+            if (mid == ring->num_points) {
+                // We're at the end. Go to 0
+                NanReturnValue(NanNew<v8::String>(vpoint_arr[0].id));
+                return;
+            }
 
-        mid_val = vpoint_arr[mid].point;
-        mid_val_1 = mid == 0 ? 0 : vpoint_arr[mid-1].point;
-        if (h <= mid_val && h > mid_val_1) {
-            info.GetReturnValue().Set(String::NewFromUtf8(isolate, vpoint_arr[mid].id));
-            return;
+            mid_val = vpoint_arr[mid].point;
+            mid_val_1 = mid == 0 ? 0 : vpoint_arr[mid-1].point;
+            if (h <= mid_val && h > mid_val_1) {
+                NanReturnValue(NanNew<v8::String>(vpoint_arr[mid].id));
+                return;
+            }
+            if (mid_val < h)
+                low = mid + 1;
+            else
+                high = mid - 1;
+            if (low > high) {
+                NanReturnValue(NanNew<v8::String>(vpoint_arr[0].id));
+                return;
+            }
         }
-        if (mid_val < h)
-            low = mid + 1;
-        else
-            high = mid - 1;
-        if (low > high) {
-            info.GetReturnValue().Set(String::NewFromUtf8(isolate, vpoint_arr[0].id));
-            return;
-        }
-    }
 }

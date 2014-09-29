@@ -2,7 +2,7 @@
 #define HASH_RING_H_
 
 #include <node.h>
-#include <node_object_wrap.h>
+#include <nan.h>
 
 typedef int (*compfn)(const void*, const void*);
 
@@ -31,8 +31,8 @@ class HashRing : public node::ObjectWrap {
 
     static void Initialize(v8::Handle<v8::Object> target);
 
-    static void New(const v8::FunctionCallbackInfo<v8::Value>& info);
-    static void GetNode(const v8::FunctionCallbackInfo<v8::Value>& info);
+    static NAN_METHOD(New);
+    static NAN_METHOD(GetNode);
 
   private:
     static void hash_digest(char *in, unsigned char out[16]);

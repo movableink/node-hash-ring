@@ -6,6 +6,9 @@
         'src/md5.cc',
         'src/hash_ring.cc',
         'src/module.cc'
+      ],
+      "include_dirs" : [
+        "<!(node -e \"require('nan')\")"
       ]
     }
   ]
