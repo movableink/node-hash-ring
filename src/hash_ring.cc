@@ -129,14 +129,14 @@ NAN_METHOD(HashRing::GetNode) {
             if (mid == ring->num_points) {
                 // We're at the end. Go to 0
                 NanReturnValue(NanNew<v8::String>(vpoint_arr[0].id));
-                return;
+                break;
             }
 
             mid_val = vpoint_arr[mid].point;
             mid_val_1 = mid == 0 ? 0 : vpoint_arr[mid-1].point;
             if (h <= mid_val && h > mid_val_1) {
                 NanReturnValue(NanNew<v8::String>(vpoint_arr[mid].id));
-                return;
+                break;
             }
             if (mid_val < h)
                 low = mid + 1;
@@ -144,7 +144,7 @@ NAN_METHOD(HashRing::GetNode) {
                 high = mid - 1;
             if (low > high) {
                 NanReturnValue(NanNew<v8::String>(vpoint_arr[0].id));
-                return;
+                break;
             }
         }
 }
