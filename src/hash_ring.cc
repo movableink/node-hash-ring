@@ -32,14 +32,15 @@ int HashRing::vpoint_compare(Vpoint *a, Vpoint *b) {
     return (a->point < b->point) ? -1 : ((a->point > b->point) ? 1 : 0);
 }
 
-void HashRing::Initialize(Handle<Object> target) {
+void HashRing::Initialize(Handle<Object> exports) {
     NanScope();
     Local<FunctionTemplate> t = NanNew<FunctionTemplate>(New);
+    t->SetClassName(NanNew("HashRing"));
     t->InstanceTemplate()->SetInternalFieldCount(1);
 
     NODE_SET_PROTOTYPE_METHOD(t, "getNode", GetNode);
 
-    target->Set(NanNew("HashRing"), t->GetFunction());
+    exports->Set(NanNew("HashRing"), t->GetFunction());
 }
 
 HashRing::HashRing(Local<Object> weight_hash) : ObjectWrap() {
@@ -109,9 +110,8 @@ NAN_METHOD(HashRing::New) {
 }
 
 NAN_METHOD(HashRing::GetNode) {
-    HashRing *hash_ring = ObjectWrap::Unwrap<HashRing>(args.This());
     NanScope();
-
+    HashRing *hash_ring = ObjectWrap::Unwrap<HashRing>(args.This());
     Ring* ring = &(hash_ring->ring);
 
     Local<String> str = args[0]->ToString();

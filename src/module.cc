@@ -1,10 +1,10 @@
-#include <node.h>
 #include <nan.h>
 #include "hash_ring.h"
 
-extern "C"
-void init (v8::Handle<v8::Object> target) {
-    HashRing::Initialize(target);
+using namespace v8;
+
+void initAll (Handle<Object> exports) {
+    HashRing::Initialize(exports);
 }
 
-NODE_MODULE(hash_ring, init);
+NODE_MODULE(hash_ring, initAll);

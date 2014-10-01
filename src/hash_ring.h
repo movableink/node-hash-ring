@@ -1,7 +1,6 @@
 #ifndef HASH_RING_H_
 #define HASH_RING_H_
 
-#include <node.h>
 #include <nan.h>
 
 typedef int (*compfn)(const void*, const void*);
@@ -26,7 +25,7 @@ class HashRing : public node::ObjectWrap {
     Ring ring;
 
   public:
-    HashRing(v8::Local<v8::Object> weight_hash);
+    explicit HashRing(v8::Local<v8::Object> weight_hash);
     ~HashRing();
 
     static void Initialize(v8::Handle<v8::Object> target);
