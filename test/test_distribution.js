@@ -1,4 +1,4 @@
-var should = require('should');
+var assert = require('assert');
 
 var HashRing = require("../index");
 
@@ -23,13 +23,8 @@ var genCode = function (length) {
     return ret;
 };
 
-var randomDistribution = function () {
-};
-
-randomDistribution();
-
-module.exports = {
-  'should be randomly distributed': function () {
+describe("hash ring", function() {
+  it('should be randomly distributed', function () {
     var counts = {},
         node, i, len, word;
     for (i = 0, len = nodes.length; i < len; i++) {
@@ -49,7 +44,9 @@ module.exports = {
       , lower = 1.0 / 3 - 0.05
       , upper = 1.0 / 3 + 0.05;
     for (node in counts) {
-      (counts[node] / total).should.be.within(lower, upper);
+      var result = (counts[node] / total);
+      assert(result > lower);
+      assert(result < upper);
     }
-  }
-};
+  });
+});

@@ -1,5 +1,3 @@
-var sys = require("sys");
-
 var HashRing = require("../index");
 
 var nodes = {
@@ -13,5 +11,11 @@ for(var i=0; i<1000000; i++){
 	var ring = new HashRing(nodes);
 	ring.getNode('a'+i+'b'+i);
 }
+
 console.log('Time: '+((new Date()).getTime() - time)/100+' s');
 
+console.log("Cool down...");
+
+setTimeout(function() {
+  console.log("Done.");
+}, 15000);

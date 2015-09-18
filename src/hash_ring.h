@@ -20,7 +20,7 @@ typedef struct {
     int weight;
 } NodeInfo;
 
-class HashRing : public node::ObjectWrap {
+class HashRing : public Nan::ObjectWrap {
 
     Ring ring;
 
@@ -28,7 +28,7 @@ class HashRing : public node::ObjectWrap {
     explicit HashRing(v8::Local<v8::Object> weight_hash);
     ~HashRing();
 
-    static void Initialize(v8::Handle<v8::Object> target);
+    static NAN_MODULE_INIT(Initialize);
 
     static NAN_METHOD(New);
     static NAN_METHOD(GetNode);
