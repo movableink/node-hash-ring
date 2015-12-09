@@ -40,7 +40,7 @@ NAN_MODULE_INIT(HashRing::Initialize) {
 
     SetPrototypeMethod(tpl, "getNode", GetNode);
 
-    Set(target, Nan::New<v8::String>("HashRing").ToLocalChecked(), tpl->GetFunction());
+    Nan::Set(target, Nan::New<v8::String>("HashRing").ToLocalChecked(), tpl->GetFunction());
 }
 
 HashRing::HashRing(Local<Object> weight_hash) : Nan::ObjectWrap() {
