@@ -54,7 +54,7 @@ HashRing::HashRing(Local<Object> weight_hash) : Nan::ObjectWrap() {
     for (unsigned int i = 0; i < num_servers; i++) {
         NodeInfo *node = &(node_list[i]);
         node_name = Nan::Get(node_names, i).ToLocalChecked()->ToString();
-        String::Utf8Value utfVal(node_name);
+        Nan::Utf8String utfVal(node_name);
         node->id = new char[utfVal.length()];
         strcpy(node->id, *utfVal);
         node->weight = Nan::Get(weight_hash, node_name).ToLocalChecked()->Uint32Value();
@@ -112,9 +112,7 @@ NAN_METHOD(HashRing::GetNode) {
     Ring* ring = &(hash_ring->ring);
 
     Local<String> str = info[0]->ToString();
-    String::Utf8Value utfVal(str);
-    char* key = *utfVal;
-    unsigned int h = hash_val(key);
+    unsigned int h = hash_val(*Nan::Utf8String(str));
 
     int high = ring->num_points;
     Vpoint *vpoint_arr = ring->vpoints;
