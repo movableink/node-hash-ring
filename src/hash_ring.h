@@ -1,8 +1,7 @@
 #ifndef HASH_RING_H_
 #define HASH_RING_H_
 
-#include <node.h>
-#include <node_object_wrap.h>
+#include <nan.h>
 
 typedef int (*compfn)(const void*, const void*);
 
@@ -21,18 +20,18 @@ typedef struct {
     int weight;
 } NodeInfo;
 
-class HashRing : public node::ObjectWrap {
+class HashRing : public Nan::ObjectWrap {
 
     Ring ring;
 
   public:
-    HashRing(v8::Local<v8::Object> weight_hash);
+    explicit HashRing(v8::Local<v8::Object> weight_hash);
     ~HashRing();
 
-    static void Initialize(v8::Handle<v8::Object> target);
+    static NAN_MODULE_INIT(Initialize);
 
-    static v8::Handle<v8::Value> New(const v8::Arguments &args);
-    static v8::Handle<v8::Value> GetNode(const v8::Arguments &args);
+    static NAN_METHOD(New);
+    static NAN_METHOD(GetNode);
 
   private:
     static void hash_digest(char *in, unsigned char out[16]);
