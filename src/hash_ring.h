@@ -13,6 +13,7 @@ typedef struct {
 typedef struct {
     int num_points;
     Vpoint *vpoints;
+    int precision;
 } Ring;
 
 typedef struct {
@@ -25,7 +26,7 @@ class HashRing : public Nan::ObjectWrap {
     Ring ring;
 
   public:
-    explicit HashRing(v8::Local<v8::Object> weight_hash);
+    explicit HashRing(v8::Local<v8::Object> weight_hash, uint32_t precision);
     ~HashRing();
 
     static NAN_MODULE_INIT(Initialize);
