@@ -61,7 +61,7 @@ describe("hash ring", function() {
     assert.equal(bValues.length, stillBValues.length, "all 'b' bucket values are still in 'b'");
 
     const moreWeights = {'a': 1, 'b': 1, 'c': 1, 'd': 1};
-    const moreRing = new HashRing(weights);
+    const moreRing = new HashRing(moreWeights);
     const stillBorDValues = bValues.filter(word => {
       const value = moreRing.getNode(word);
       return value === 'b' || value === 'd';
