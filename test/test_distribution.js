@@ -35,13 +35,13 @@ describe("hash ring", function() {
   it('consistently distributes identical values', function() {
     const weights = {'a': 1, 'b': 1, 'c': 1};
 
-    const trial = trialPVal(weights, 3000, () => 'hello');
+    const trial = trialPVal(weights, 3000, () => 'hello', 1000);
     assert.equal(trial.counts['b'], 3000, 'all values bucketed the same');
   });
 
   it('keeps existing bucket choices when removing buckets', function() {
     const weights = {'a': 1, 'b': 1, 'c': 1};
-    const ring = new HashRing(weights);
+    const ring = new HashRing(weights, 1000);
 
     const bValues = [];
     for (let i = 0; i < iterations; i++) {
@@ -53,7 +53,7 @@ describe("hash ring", function() {
     }
 
     const fewerWeights = {'a': 1, 'b': 1};
-    const fewerRing = new HashRing(weights);
+    const fewerRing = new HashRing(weights, 1000);
     const stillBValues = bValues.filter(word => {
       return fewerRing.getNode(word) === 'b';
     });
@@ -61,7 +61,7 @@ describe("hash ring", function() {
     assert.equal(bValues.length, stillBValues.length, "all 'b' bucket values are still in 'b'");
 
     const moreWeights = {'a': 1, 'b': 1, 'c': 1, 'd': 1};
-    const moreRing = new HashRing(moreWeights);
+    const moreRing = new HashRing(moreWeights, 1000);
     const stillBorDValues = bValues.filter(word => {
       const value = moreRing.getNode(word);
       return value === 'b' || value === 'd';

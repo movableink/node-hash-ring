@@ -11,7 +11,7 @@ using namespace v8;
 using namespace node;
 using namespace Nan;
 
-uint32_t DEFAULT_PRECISION = 1000;
+uint32_t DEFAULT_PRECISION = 40;
 
 void HashRing::hash_digest(char *in, unsigned char out[16]) {
     md5_state_t md5_state;
