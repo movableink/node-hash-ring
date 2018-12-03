@@ -11,6 +11,8 @@ using namespace v8;
 using namespace node;
 using namespace Nan;
 
+uint32_t DEFAULT_PRECISION = 40;
+
 void HashRing::hash_digest(char *in, unsigned char out[16]) {
     md5_state_t md5_state;
     md5_init(&md5_state);
@@ -43,7 +45,7 @@ NAN_MODULE_INIT(HashRing::Initialize) {
     Nan::Set(target, Nan::New<v8::String>("HashRing").ToLocalChecked(), tpl->GetFunction());
 }
 
-HashRing::HashRing(Local<Object> weight_hash) : Nan::ObjectWrap() {
+HashRing::HashRing(Local<Object> weight_hash, uint32_t precision) : Nan::ObjectWrap() {
     Local<v8::Array> node_names = Nan::GetPropertyNames(weight_hash).ToLocalChecked();
     Local<String> node_name;
     uint32_t weight_total = 0;
@@ -62,12 +64,12 @@ HashRing::HashRing(Local<Object> weight_hash) : Nan::ObjectWrap() {
         weight_total += node->weight;
     }
 
-    Vpoint *vpoint_list = new Vpoint[num_servers * 160];
+    Vpoint *vpoint_list = new Vpoint[num_servers * 4 * precision];
     unsigned int j, k;
     int vpoint_idx = 0;
     for (j = 0; j < num_servers; j++) {
         float percent = (float) node_list[j].weight / (float) weight_total;
-        unsigned int num_replicas = floorf(percent * 40.0 * (float) num_servers);
+        unsigned int num_replicas = floorf(percent * precision * (float) num_servers);
         for (k = 0; k < num_replicas; k++) {
             char ss[30];
             sprintf(ss, "%s-%d", node_list[j].id, k);
@@ -98,7 +100,13 @@ HashRing::~HashRing(){
 NAN_METHOD(HashRing::New) {
     if (info.IsConstructCall() && info.Length() >= 1 && info[0]->IsObject()) {
         Local<Object> weight_hash = info[0]->ToObject();
-        HashRing* hash_ring = new HashRing(weight_hash);
+
+        uint32_t precision = DEFAULT_PRECISION;
+        if (info.Length() >= 2 && info[1]->IsNumber()) {
+          precision = (int) info[1]->Uint32Value();
+        }
+
+        HashRing* hash_ring = new HashRing(weight_hash, precision);
 
         hash_ring->Wrap(info.This());
         info.GetReturnValue().Set(info.This());
