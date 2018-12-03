@@ -16,6 +16,14 @@ describe("hash ring", function() {
     assert.ok(pval > acceptablePVal, `expect pval ${pval} to be > ${acceptablePVal}`);
   });
 
+  it('semi-randomly distributes even weights when no precision passed', function() {
+    const weights = {'a': 1, 'b': 1, 'c': 1};
+    const fn = () => genCode(10);
+
+    const pval = trialPVals(runs, weights, iterations, fn);
+    assert.ok(pval > 0, `expect pval ${pval} to be > 0`);
+  });
+
   it('randomly distributes different weights', function () {
     const weights = {'a': 1, 'b': 1, 'c': 4};
     const fn = () => genCode(10);
