@@ -1,6 +1,6 @@
 {
-  "name": "hash_ring",
-  "version": "0.2.2",
+  "name": "@movable/hash_ring",
+  "version": "0.3.0",
   "description": "Consistent hashing C++ Add-on for node.js",
   "keywords": [
     "node",
@@ -25,7 +25,7 @@
   "main": "./index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bnoguchi/node-hash-ring.git"
+    "url": "https://github.com/movableink/node-hash-ring.git"
   },
   "dependencies": {
     "nan": "2.10.0"
@@ -35,7 +35,7 @@
     "mocha": "^2.3.2"
   },
   "bugs": {
-    "url": "https://github.com/bnoguchi/node-hash-ring/issues"
+    "url": "https://github.com/movableink/node-hash-ring/issues"
   },
   "engines": {
     "node": ">=0.6.x"
