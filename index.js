@@ -1,1 +1,4 @@
-module.exports = require("./build/Release/hash_ring").HashRing;
+'use strict'
+
+const { HashRing } = require('node-gyp-build')(__dirname);
+module.exports = HashRing;

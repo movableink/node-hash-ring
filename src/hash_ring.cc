@@ -3,151 +3,122 @@
 #include <math.h>   // For floorf
 #include <string.h> // For strlen
 #include "md5.h"
-#include <nan.h>
 #include "hash_ring.h"
-#include <iostream>
-using namespace std;
-using namespace v8;
-using namespace node;
-using namespace Nan;
 
-uint32_t DEFAULT_PRECISION = 40;
-
-void HashRing::hash_digest(char *in, unsigned char out[16]) {
-    md5_state_t md5_state;
-    md5_init(&md5_state);
-    md5_append(&md5_state, (unsigned char*) in, strlen(in));
-    md5_finish(&md5_state, out);
+void HashRing::hash_digest(const char *in, unsigned char out[16]) {
+  md5_state_t md5_state;
+  md5_init(&md5_state);
+  md5_append(&md5_state, (unsigned char*) in, strlen(in));
+  md5_finish(&md5_state, out);
 };
 
-unsigned int HashRing::hash_val(char *in) {
-    unsigned char digest[16];
-    hash_digest(in, digest);
-    return (unsigned int) (
-                           (digest[3] << 24) |
-                           (digest[2] << 16) |
-                           (digest[1] << 8) |
-                           digest[0]
-                           );
+unsigned int HashRing::hash_val(const char *in) {
+  unsigned char digest[16];
+  hash_digest(in, digest);
+  return (unsigned int) (
+                         (digest[3] << 24) |
+                         (digest[2] << 16) |
+                         (digest[1] << 8) |
+                         digest[0]
+                         );
 }
 
 int HashRing::vpoint_compare(Vpoint *a, Vpoint *b) {
-    return (a->point < b->point) ? -1 : ((a->point > b->point) ? 1 : 0);
+  return (a->point < b->point) ? -1 : ((a->point > b->point) ? 1 : 0);
 }
 
-NAN_MODULE_INIT(HashRing::Initialize) {
-    Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(New);
-    tpl->SetClassName(Nan::New<v8::String>("HashRing").ToLocalChecked());
-    tpl->InstanceTemplate()->SetInternalFieldCount(1);
+HashRing::HashRing(std::map<std::string, uint32_t> weights, uint32_t precision) {
+  uint32_t weight_total = 0;
+  unsigned int num_buckets = weights.size();
 
-    SetPrototypeMethod(tpl, "getNode", GetNode);
+  NodeInfo *node_list = new NodeInfo[num_buckets];
 
-    Nan::Set(target, Nan::New<v8::String>("HashRing").ToLocalChecked(), tpl->GetFunction());
-}
+  int i = 0;
+  // Construct the bucket list based on the weight hash
+  for (const auto& weight: weights) {
+    NodeInfo *node = &(node_list[i]);
+    node->id = weight.first;
+    node->weight = weight.second;
+    node_list[i] = *node;
+    weight_total += node->weight;
+    i++;
+  }
 
-HashRing::HashRing(Local<Object> weight_hash, uint32_t precision) : Nan::ObjectWrap() {
-    Local<v8::Array> node_names = Nan::GetPropertyNames(weight_hash).ToLocalChecked();
-    Local<String> node_name;
-    uint32_t weight_total = 0;
-    unsigned int num_servers = node_names->Length();
-
-    NodeInfo *node_list = new NodeInfo[num_servers];
-    // Construct the server list based on the weight hash
-    for (unsigned int i = 0; i < num_servers; i++) {
-        NodeInfo *node = &(node_list[i]);
-        node_name = Nan::Get(node_names, i).ToLocalChecked()->ToString();
-        Nan::Utf8String utfVal(node_name);
-        node->id = new char[utfVal.length()];
-        strcpy(node->id, *utfVal);
-        node->weight = Nan::Get(weight_hash, node_name).ToLocalChecked()->Uint32Value();
-        node_list[i] = *node;
-        weight_total += node->weight;
+  Vpoint *vpoint_list = new Vpoint[num_buckets * 4 * precision];
+  unsigned int j, k;
+  int vpoint_idx = 0;
+  for (j = 0; j < num_buckets; j++) {
+    float percent = (float) node_list[j].weight / (float) weight_total;
+    unsigned int num_replicas = floorf(percent * precision * (float) num_buckets);
+    for (k = 0; k < num_replicas; k++) {
+      char ss[30];
+      sprintf(ss, "%s-%d", node_list[j].id.c_str(), k);
+      unsigned char digest[16];
+      hash_digest(ss, digest);
+      int m;
+      for (m = 0; m < 4; m++) {
+        vpoint_list[vpoint_idx].point = (digest[3 + m*4] << 24) |
+          (digest[2 + m*4] << 16) |
+          (digest[1 + m*4] << 8) |
+          digest[m*4];
+        vpoint_list[vpoint_idx].id = node_list[j].id;
+        vpoint_idx++;
+      }
     }
+  }
+  delete [] node_list;
+  qsort((void*) vpoint_list, vpoint_idx, sizeof(Vpoint), (compfn) vpoint_compare);
 
-    Vpoint *vpoint_list = new Vpoint[num_servers * 4 * precision];
-    unsigned int j, k;
-    int vpoint_idx = 0;
-    for (j = 0; j < num_servers; j++) {
-        float percent = (float) node_list[j].weight / (float) weight_total;
-        unsigned int num_replicas = floorf(percent * precision * (float) num_servers);
-        for (k = 0; k < num_replicas; k++) {
-            char ss[30];
-            sprintf(ss, "%s-%d", node_list[j].id, k);
-            unsigned char digest[16];
-            hash_digest(ss, digest);
-            int m;
-            for (m = 0; m < 4; m++) {
-                vpoint_list[vpoint_idx].point = (digest[3 + m*4] << 24) |
-                    (digest[2 + m*4] << 16) |
-                    (digest[1 + m*4] << 8) |
-                    digest[m*4];
-                vpoint_list[vpoint_idx].id = node_list[j].id;
-                vpoint_idx++;
-            }
-        }
-    }
-    delete [] node_list;
-    qsort((void*) vpoint_list, vpoint_idx, sizeof(Vpoint), (compfn) vpoint_compare);
+  ring.vpoints = vpoint_list;
+  ring.num_points = vpoint_idx;
 
-    ring.vpoints = vpoint_list;
-    ring.num_points = vpoint_idx;
+  weightMap = weights;
 }
 
-HashRing::~HashRing(){
+HashRing::~HashRing() {
     delete [] ring.vpoints;
 }
 
-NAN_METHOD(HashRing::New) {
-    if (info.IsConstructCall() && info.Length() >= 1 && info[0]->IsObject()) {
-        Local<Object> weight_hash = info[0]->ToObject();
+std::vector<std::string> HashRing::GetBuckets() {
+  std::vector<std::string> keys;
+  keys.reserve(weightMap.size());
+  for(auto const& weight: weightMap) {
+    keys.push_back(weight.first);
+  }
 
-        uint32_t precision = DEFAULT_PRECISION;
-        if (info.Length() >= 2 && info[1]->IsNumber()) {
-          precision = (int) info[1]->Uint32Value();
-        }
-
-        HashRing* hash_ring = new HashRing(weight_hash, precision);
-
-        hash_ring->Wrap(info.This());
-        info.GetReturnValue().Set(info.This());
-    } else {
-        Nan::ThrowTypeError("Bad argument");
-    }
+  return keys;
 }
 
-NAN_METHOD(HashRing::GetNode) {
-    HashRing *hash_ring = Nan::ObjectWrap::Unwrap<HashRing>(info.This());
-    Ring* ring = &(hash_ring->ring);
+std::string HashRing::GetNode(std::string str) {
+  unsigned int h = hash_val(str.c_str());
 
-    Local<String> str = info[0]->ToString();
-    unsigned int h = hash_val(*Nan::Utf8String(str));
+  int high = ring.num_points;
+  Vpoint *vpoint_arr = ring.vpoints;
+  int low = 0, mid;
+  unsigned int mid_val, mid_val_1;
 
-    int high = ring->num_points;
-    Vpoint *vpoint_arr = ring->vpoints;
-    int low = 0, mid;
-    unsigned int mid_val, mid_val_1;
-    while (true)
-        {
-            mid = (int) ( (low + high) / 2);
-            if (mid == ring->num_points) {
-                // We're at the end. Go to 0
-                info.GetReturnValue().Set(Nan::New<v8::String>(vpoint_arr[0].id).ToLocalChecked());
-                break;
-            }
+  while (true) {
+    mid = (int) ( (low + high) / 2);
+    if (mid == ring.num_points) {
+      // We're at the end. Go to 0
+      return vpoint_arr[0].id;
+    }
 
-            mid_val = vpoint_arr[mid].point;
-            mid_val_1 = mid == 0 ? 0 : vpoint_arr[mid-1].point;
-            if (h <= mid_val && h > mid_val_1) {
-                info.GetReturnValue().Set(Nan::New<v8::String>(vpoint_arr[mid].id).ToLocalChecked());
-                break;
-            }
-            if (mid_val < h)
-                low = mid + 1;
-            else
-                high = mid - 1;
-            if (low > high) {
-                info.GetReturnValue().Set(Nan::New<v8::String>(vpoint_arr[0].id).ToLocalChecked());
-                break;
-            }
-        }
+    mid_val = vpoint_arr[mid].point;
+    mid_val_1 = mid == 0 ? 0 : vpoint_arr[mid-1].point;
+
+    if (h <= mid_val && h > mid_val_1) {
+      return vpoint_arr[mid].id;
+    }
+
+    if (mid_val < h) {
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+
+    if (low > high) {
+      return vpoint_arr[0].id;
+    }
+  }
 }

@@ -7,7 +7,7 @@ const iterations = 10000;
 const runs = 10;
 const acceptablePVal = 0.10;
 
-describe("hash ring", function() {
+describe("hash ring distribution", function() {
   it('randomly distributes even weights', function () {
     const weights = {'a': 1, 'b': 1, 'c': 1};
     const fn = () => genCode(10);
