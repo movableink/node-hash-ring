@@ -2,5 +2,6 @@
 /build
 node_modules
 **.swp
+!.travis.yml
 !.gitignore
 npm-debug.log
