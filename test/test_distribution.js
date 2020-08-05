@@ -49,4 +49,27 @@ describe("hash ring", function() {
       assert(result < upper);
     }
   });
+
+
+  it('is deterministic', function() {
+    const nodes = {
+      "127.0.0.1:8080": 1,
+      "127.0.0.2:8080": 1,
+      "127.0.0.3:8080": 1
+    };
+
+    const ring = new HashRing(nodes, 40);
+
+    assert.equal(ring.getNode("a"), "127.0.0.2:8080");
+    assert.equal(ring.getNode("b"), "127.0.0.2:8080");
+    assert.equal(ring.getNode("c"), "127.0.0.3:8080");
+    assert.equal(ring.getNode("d"), "127.0.0.1:8080");
+    assert.equal(ring.getNode("e"), "127.0.0.2:8080");
+    assert.equal(ring.getNode("f"), "127.0.0.2:8080");
+    assert.equal(ring.getNode("g"), "127.0.0.2:8080");
+    assert.equal(ring.getNode("a!b"), "127.0.0.2:8080");
+    assert.equal(ring.getNode("c!d"), "127.0.0.1:8080");
+    assert.equal(ring.getNode("e!123"), "127.0.0.2:8080");
+    assert.equal(ring.getNode("f!456"), "127.0.0.3:8080");
+  });
 });
