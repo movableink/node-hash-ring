@@ -1,43 +1,43 @@
 #ifndef HASH_RING_H_
 #define HASH_RING_H_
 
-#include <nan.h>
+#include <string>
+#include <map>
+#include <vector>
 
 typedef int (*compfn)(const void*, const void*);
 
 typedef struct {
-    unsigned int point;
-    char* id;
+  unsigned int point;
+  const char* id;
 } Vpoint;
 
 typedef struct {
-    int num_points;
-    Vpoint *vpoints;
-    int precision;
+  int num_points;
+  Vpoint *vpoints;
+  int precision;
 } Ring;
 
 typedef struct {
-    char* id;
-    int weight;
+  const char* id;
+  int weight;
 } NodeInfo;
 
-class HashRing : public Nan::ObjectWrap {
+class HashRing {
 
-    Ring ring;
+public:
+  explicit HashRing(std::map<std::string, uint32_t> weights, uint32_t precision);
+  ~HashRing();
 
-  public:
-    explicit HashRing(v8::Local<v8::Object> weight_hash, uint32_t precision);
-    ~HashRing();
+  std::string GetNode(std::string str);
+  std::vector<std::string> GetBuckets();
 
-    static NAN_MODULE_INIT(Initialize);
-
-    static NAN_METHOD(New);
-    static NAN_METHOD(GetNode);
-
-  private:
-    static void hash_digest(char *in, unsigned char out[16]);
-    static unsigned int hash_val(char *in);
-    static int vpoint_compare(Vpoint *a, Vpoint *b);
+private:
+  static void hash_digest(const char *in, unsigned char out[16]);
+  static unsigned int hash_val(const char *in);
+  static int vpoint_compare(Vpoint *a, Vpoint *b);
+  Ring ring;
+  std::map<std::string, uint32_t> weightMap;
 };
 
 #endif // HASH_RING_H_
