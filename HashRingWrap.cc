@@ -80,7 +80,7 @@ Napi::Value HashRingWrap::GetNode(const Napi::CallbackInfo& info) {
     return env.Null();
   }
 
-  Napi::String str = info[0].As<Napi::String>();
+  std::string str = info[0].As<Napi::String>().Utf8Value();
 
   Napi::String result = Napi::String::New(env, this->hashring->GetNode(str));
   return result;

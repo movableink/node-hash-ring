@@ -9,7 +9,7 @@ typedef int (*compfn)(const void*, const void*);
 
 typedef struct {
   unsigned int point;
-  std::string id;
+  const char* id;
 } Vpoint;
 
 typedef struct {
@@ -19,7 +19,7 @@ typedef struct {
 } Ring;
 
 typedef struct {
-  std::string id;
+  const char* id;
   int weight;
 } NodeInfo;
 

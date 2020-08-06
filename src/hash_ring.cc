@@ -37,7 +37,9 @@ HashRing::HashRing(std::map<std::string, uint32_t> weights, uint32_t precision) 
   // Construct the bucket list based on the weight hash
   for (const auto& weight: weights) {
     NodeInfo *node = &(node_list[i]);
-    node->id = weight.first;
+    char* name = new char[weight.first.length()];
+    strcpy(name, weight.first.c_str());
+    node->id = name;
     node->weight = weight.second;
     node_list[i] = *node;
     weight_total += node->weight;
@@ -52,7 +54,7 @@ HashRing::HashRing(std::map<std::string, uint32_t> weights, uint32_t precision) 
     unsigned int num_replicas = floorf(percent * precision * (float) num_buckets);
     for (k = 0; k < num_replicas; k++) {
       char ss[30];
-      sprintf(ss, "%s-%d", node_list[j].id.c_str(), k);
+      sprintf(ss, "%s-%d", node_list[j].id, k);
       unsigned char digest[16];
       hash_digest(ss, digest);
       int m;
@@ -76,7 +78,7 @@ HashRing::HashRing(std::map<std::string, uint32_t> weights, uint32_t precision) 
 }
 
 HashRing::~HashRing() {
-    delete [] ring.vpoints;
+  delete [] ring.vpoints;
 }
 
 std::vector<std::string> HashRing::GetBuckets() {
