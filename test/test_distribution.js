@@ -1,7 +1,7 @@
 const assert = require('assert');
 const chiSquaredTest = require('chi-squared-test');
 
-const HashRing = require("../index");
+const { HashRing } = require("../index");
 
 const iterations = 10000;
 const runs = 10;

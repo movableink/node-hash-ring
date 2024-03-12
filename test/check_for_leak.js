@@ -1,4 +1,4 @@
-const HashRing = require("../index");
+const { HashRing } = require("../index");
 
 const nodes = {
   "127.0.0.1:8080": 1,
