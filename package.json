@@ -1,6 +1,6 @@
 {
   "name": "@movable/hash_ring",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "Consistent hashing C++ Add-on for node.js",
   "keywords": [
     "node",
@@ -23,6 +23,7 @@
     "MIT"
   ],
   "main": "./index.js",
+  "types": "./index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/movableink/node-hash-ring.git"

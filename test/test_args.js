@@ -1,6 +1,6 @@
 const assert = require('assert');
 
-const HashRing = require("../index");
+const { HashRing } = require("../index");
 
 describe("hash ring arguments", function() {
   it("instantiates with weights", function() {
