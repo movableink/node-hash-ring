@@ -1,0 +1,14 @@
+package.json
+  h_379e4357f987d8 3,46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "8fbf500de5935068423bb816f8333c99c63dc47a",
+  "prompts": {},
+  "humans": {
+    "h_379e4357f987d8": {
+      "author": "Duncan Schulze <13733349+duncaan@users.noreply.github.com>"
+    }
+  }
+}
