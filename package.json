@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "chi-squared-test": "^1.1.0",
-    "mocha": "^2.3.2"
+    "mocha": "^11.7.6"
   },
   "bugs": {
     "url": "https://github.com/movableink/node-hash-ring/issues"
