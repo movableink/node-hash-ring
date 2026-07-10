@@ -1,6 +1,7 @@
 #ifndef HASH_RING_H_
 #define HASH_RING_H_
 
+#include <cstdint>
 #include <string>
 #include <map>
 #include <vector>
