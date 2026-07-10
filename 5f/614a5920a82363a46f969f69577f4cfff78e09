@@ -1,0 +1,22 @@
+package.json
+  s_c2da986d891e4f::t_6295e55dbf30f3 43
+  s_c2da986d891e4f::t_55d71a4caefcbe 32
+package-lock.json
+  ai_agent 11,684-690
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "5f614a5920a82363a46f969f69577f4cfff78e09",
+  "prompts": {},
+  "sessions": {
+    "s_c2da986d891e4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4d517f5-f88a-4fb8-a7a4-6b11cb4bc311",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Duncan Schulze <13733349+duncaan@users.noreply.github.com>"
+    }
+  }
+}
