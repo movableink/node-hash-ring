@@ -1,0 +1,19 @@
+README.md
+  s_c2da986d891e4f::t_ab7a509e31386d 4,8,10,12,14,16,18,23,25,28-37,40,44,46,54-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "e7587cc26eac3e3cec8394aa5aac0dd0255499da",
+  "prompts": {},
+  "sessions": {
+    "s_c2da986d891e4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4d517f5-f88a-4fb8-a7a4-6b11cb4bc311",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Duncan Schulze <13733349+duncaan@users.noreply.github.com>"
+    }
+  }
+}
