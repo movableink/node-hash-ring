@@ -1,0 +1,33 @@
+.github/workflows/test.yaml
+  s_c2da986d891e4f::t_f6fba44792e443 21-25
+  h_379e4357f987d8 1-20
+.gitignore
+  s_c2da986d891e4f::t_f34342fb2b3259 6
+src/hash_ring.cc
+  h_379e4357f987d8 40,56,58
+Makefile
+  s_c2da986d891e4f::t_41d36b40563422 2
+src/hash_ring.h
+  h_379e4357f987d8 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "1daf477e494d38a61ab7cf8468b8f177e84db5b2",
+  "prompts": {},
+  "humans": {
+    "h_379e4357f987d8": {
+      "author": "Duncan Schulze <13733349+duncaan@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_c2da986d891e4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4d517f5-f88a-4fb8-a7a4-6b11cb4bc311",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Duncan Schulze <13733349+duncaan@users.noreply.github.com>"
+    }
+  }
+}
