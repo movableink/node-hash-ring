@@ -1,0 +1,27 @@
+src/md5.cc
+  s_c2da986d891e4f::t_a68f94ec4f563c 165
+  s_c2da986d891e4f::t_6d714b63fc2604 56
+package-lock.json
+  ai_agent 3,9,19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "db6ce2e7045fc369c40267b4f07bb8b6c49c9346",
+  "prompts": {},
+  "humans": {
+    "h_379e4357f987d8": {
+      "author": "Duncan Schulze <13733349+duncaan@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_c2da986d891e4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4d517f5-f88a-4fb8-a7a4-6b11cb4bc311",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Duncan Schulze <13733349+duncaan@users.noreply.github.com>"
+    }
+  }
+}
