@@ -1,45 +1,49 @@
 ## node-hash-ring - Consistent Hashing C++ Add-on for node.js
 ---
 
-See this [blog post](http://ngchi.wordpress.com/2010/08/23/towards-auto-sharding-in-your-node-js-app/) for more information.
+See this [blog post](http://ngchi.wordpress.com/2010/08/23/towards-auto-sharding-in-your-node-js-app/) for background on the algorithm.
 
 ### Installation
+
 Via npm:
 
-    npm install hash_ring
+    npm install @movable/hash_ring
 
-Via git:
+The native addon is compiled on install via `node-gyp` (invoked automatically), so a C++ toolchain is required.
 
-    git clone http://github.com/bnoguchi/node-hash-ring.git
+From source:
 
-    #### node < 0.8.0
-    cd node-hash-ring/src
-    node-waf configure build
-
-    #### node >= 0.8.0
+    git clone https://github.com/movableink/node-hash-ring.git
     cd node-hash-ring
-    node-gyp configure build
+    npm install
 
 ### Example
 
 ```javascript
-var HashRing = require("./lib/hash_ring");
+const { HashRing } = require("@movable/hash_ring");
 
-// Create a cluster of 3 servers weighted so that 127.0.0.2:8080 stores twice as many 
+// Create a cluster of 3 servers weighted so that 127.0.0.2:8080 stores twice as many
 // keys as 127.0.0.1:8080, and 127.0.0.3:8080 stores 4x as many keys as 127.0.0.1:8080
 // and 2x as many keys as 127.0.0.2:8080
-var ring = new HashRing({"127.0.0.1:8080": 1, "127.0.0.2:8080": 2, "127.0.0.3:8080":4});
-console.log(ring.getNode("users:102") ); // Should be 127.0.0.3:8080
+const ring = new HashRing({ "127.0.0.1:8080": 1, "127.0.0.2:8080": 2, "127.0.0.3:8080": 4 });
+
+console.log(ring.getNode("users:102")); // Should be 127.0.0.3:8080
+console.log(ring.getBuckets());         // ['127.0.0.1:8080', '127.0.0.2:8080', '127.0.0.3:8080']
 ```
 
-See [./test/test_distribution.js](https://github.com/bnoguchi/node-hash-ring/test/test_distribution.js) for another example:
-    node test/test_distribution.js
+An optional second argument controls the number of replica points per bucket (precision):
+
+```javascript
+const ring = new HashRing({ a: 5, b: 3 }, 500);
+```
+
+TypeScript definitions are bundled ([index.d.ts](index.d.ts)).
 
 ### Tests
 
-To run the tests:
+Tests run with [mocha](https://mochajs.org/):
 
-    $ make test
+    npm test
 
 ### License
 MIT License
@@ -47,3 +51,5 @@ MIT License
 ---
 ### Author
 Brian Noguchi
+
+Maintained by [Movable Ink](https://github.com/movableink).

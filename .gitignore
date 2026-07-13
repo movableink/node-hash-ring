@@ -3,4 +3,5 @@
 node_modules
 **.swp
 !.gitignore
+!.github
 npm-debug.log
