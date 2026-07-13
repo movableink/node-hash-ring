@@ -1,0 +1,14 @@
+.github/workflows/publish.yaml
+  h_379e4357f987d8 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "82901f5528bb94ab40a6675ac41cfc00887b094a",
+  "prompts": {},
+  "humans": {
+    "h_379e4357f987d8": {
+      "author": "Duncan Schulze <13733349+duncaan@users.noreply.github.com>"
+    }
+  }
+}
