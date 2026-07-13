@@ -1,0 +1,25 @@
+.github/workflows/publish.yaml
+  h_379e4357f987d8 9-10,12-26
+  s_51708634cc99e9::t_e3a4b5ea22d719 1-8,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "7692e715ab13fb54073180bc610342805a485f4a",
+  "prompts": {},
+  "humans": {
+    "h_379e4357f987d8": {
+      "author": "Duncan Schulze <13733349+duncaan@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_51708634cc99e9": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "1e96917f-5d5d-4827-9108-22b8c433c759",
+        "model": "gpt-5.3-codex"
+      },
+      "human_author": "Duncan Schulze <13733349+duncaan@users.noreply.github.com>"
+    }
+  }
+}
