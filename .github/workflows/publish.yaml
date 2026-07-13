@@ -11,7 +11,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       id-token: write
 
     steps:
@@ -23,4 +23,3 @@ jobs:
 
       - run: NODE_AUTH_TOKEN="" npm publish --access public --provenance
         name: Publish to NPM
-        continue-on-error: true
